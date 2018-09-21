@@ -17,8 +17,6 @@
 package com.github.mthizo247.cloud.netflix.zuul.web.proxytarget;
 
 import com.github.mthizo247.cloud.netflix.zuul.web.socket.ZuulWebSocketProperties;
-import com.github.mthizo247.cloud.netflix.zuul.web.util.MapPropertyResolver;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
 import org.springframework.core.Ordered;
@@ -50,14 +48,13 @@ public abstract class AbstractProxyTargetResolver implements ProxyTargetResolver
     }
 
     protected URI resolveUri(ServiceInstance serviceInstance) {
-        Map<String, Object> metadata = new HashMap<>();
+        Map<String, String> metadata = new HashMap<>();
         for (Map.Entry<String, String> entry : serviceInstance.getMetadata().entrySet()) {
-            metadata.put(entry.getKey(), entry.getValue());
+            metadata.put(entry.getKey().replaceAll("[-_.]", "").toLowerCase(), entry.getValue());
         }
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUri(serviceInstance.getUri());
-        RelaxedPropertyResolver propertyResolver = new RelaxedPropertyResolver(new MapPropertyResolver(metadata));
-        String configPath = propertyResolver.getProperty("configPath");
+        String configPath = metadata.get("configpath");
         if (configPath != null) {
             uriBuilder.path(configPath);
         }

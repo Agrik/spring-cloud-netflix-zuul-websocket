@@ -52,7 +52,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
-import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.DelegatingWebSocketMessageBrokerConfiguration;
 import org.springframework.web.socket.config.annotation.SockJsServiceRegistration;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -82,8 +82,7 @@ import java.util.UUID;
 @ConditionalOnProperty(prefix = "zuul.ws", name = "enabled", havingValue = "true", matchIfMissing = true)
 @EnableConfigurationProperties(ZuulWebSocketProperties.class)
 @AutoConfigureAfter(DelegatingWebSocketMessageBrokerConfiguration.class)
-public class ZuulWebSocketConfiguration extends AbstractWebSocketMessageBrokerConfigurer
-        implements ApplicationListener<ContextRefreshedEvent> {
+public class ZuulWebSocketConfiguration implements WebSocketMessageBrokerConfigurer, ApplicationListener<ContextRefreshedEvent> {
     @Autowired
     ZuulWebSocketProperties zuulWebSocketProperties;
     @Autowired
@@ -265,8 +264,8 @@ public class ZuulWebSocketConfiguration extends AbstractWebSocketMessageBrokerCo
 
     @PostConstruct
     public void init() {
-        ignorePattern("**/websocket");
-        ignorePattern("**/info");
+        ignorePattern("/**/websocket");
+        ignorePattern("/**/info");
     }
 
     private void ignorePattern(String ignoredPattern) {
